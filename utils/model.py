@@ -3,6 +3,7 @@ Model loading and inference utilities
 """
 import torch
 import torchvision.models as models
+from torchvision.models import ResNet50_Weights
 import torchvision.transforms as transforms
 from PIL import Image
 import json
@@ -12,8 +13,14 @@ import streamlit as st
 @st.cache_resource
 def load_model():
     """Load pretrained ResNet50 model"""
-    model = models.resnet50(pretrained=True)
+    # Use new weights parameter (PyTorch 2.5+)
+    model = models.resnet50(weights=ResNet50_Weights.DEFAULT)
     model.eval()
+    
+    # Disable gradient computation to save memory
+    for param in model.parameters():
+        param.requires_grad = False
+    
     return model
 
 @st.cache_data
